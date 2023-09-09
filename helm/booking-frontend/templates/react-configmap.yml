@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: react-configmap
+  namespace: {{ .Values.namespace }}
+data:
+  user: {{ .Values.service_paths.user }}
+  booking: {{ .Values.service_paths.booking }}
+  lodging: {{ .Values.service_paths.lodging }}
+  rating: {{ .Values.service_paths.rating }}

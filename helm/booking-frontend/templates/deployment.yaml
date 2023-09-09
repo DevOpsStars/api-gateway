@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ .Values.appName }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+          - name: REACT_APP_USER_SERVICE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: react-configmap  
+                key: user
+          - name: REACT_APP_BOOKING_SERVICE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: react-configmap  
+                key: booking
+          - name: REACT_APP_LODGING_SERVICE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: react-configmap  
+                key: lodging
+          - name: REACT_APP_RATING_SERVICE_PATH
+            valueFrom:
+              configMapKeyRef:
+                name: react-configmap  
+                key: rating      
+---

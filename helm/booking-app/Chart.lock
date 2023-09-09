@@ -1,0 +1,15 @@
+dependencies:
+- name: postgres-microservices
+  repository: file://../postgres-microservices
+  version: 0.1.0
+- name: postgres-microservices
+  repository: file://../postgres-microservices
+  version: 0.1.0
+- name: mongodb-microservices
+  repository: file://../mongodb-microservices
+  version: 0.1.0
+- name: booking-frontend
+  repository: file://../booking-frontend
+  version: 0.1.0
+digest: sha256:bf606126ba9080ed9e1df33b9bcc585dbfa1d3d3633d65b96844574d8dd8632c
+generated: "2023-09-08T00:43:37.9653725+02:00"

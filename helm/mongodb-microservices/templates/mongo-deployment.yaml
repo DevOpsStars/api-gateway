@@ -1,0 +1,88 @@
+---
+# Define a 'Service' To Expose mongodb to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: mongodb
+    tier: database
+spec:
+  ports:
+    - port: {{ .Values.mongodbPort }}
+  selector:
+    app: mongodb
+    tier: database
+  clusterIP: None
+
+---
+# Define a 'Persistent Voulume Claim'(PVC) for MongoDB Storage, dynamically provisioned by cluster
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pv-claim # name of PVC essential for identifying the storage data
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: mongodb
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce   #This specifies the mode of the claim that we are trying to create.
+  resources:
+    requests:
+      storage: 1Gi    #This will tell kubernetes about the amount of space we are trying to claim.
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: mongodb
+    tier: database
+    
+spec:
+  selector: # mysql Pod Should contain same labels
+    matchLabels:
+      app: mongodb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: mongodb
+        tier: database
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-password
+            - name: MONGO_DB # Setting Database Name from a 'ConfigMap'
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-configmap
+                  key: database
+
+          ports:
+            - containerPort: {{ .Values.mongodbPort }}
+              name: mongodb
+          volumeMounts:
+            - mountPath: /var/lib/mongodb/data
+              name: mongodb-persistence-storage
+      volumes:
+        - name: mongodb-persistence-storage
+          persistentVolumeClaim:
+            claimName: mongodb-pv-claim

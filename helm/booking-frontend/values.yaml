@@ -1,0 +1,14 @@
+appName: booking-frontend
+namespace: frontend
+nodePort: 31007
+
+image:
+  name: mladenv7/booking-frontend
+  tag: latest
+
+
+service_paths:
+  user: http://localhost/user
+  booking: http://localhost/booking
+  lodging: http://localhost/lodging
+  rating: http://localhost/rating
